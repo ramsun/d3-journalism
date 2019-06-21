@@ -14,24 +14,20 @@ var height = svgHeight - margin.top - margin.bottom;
 // Create an SVG wrapper, append an SVG group that will hold our chart,
 // and shift the latter by left and top margins.
 var svg = d3
-  .select(".scatter")
+  .select("#scatter")
   .append("svg")
   .attr("width", svgWidth)
   .attr("height", svgHeight);
 
 // Append an SVG group
-var chartGroup = svg.append("g")
+var chartGroup = svg
+  .append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-  // Retrieve data from the CSV file and execute everything below
-d3.csv("assets/data/data.csv", function(err, censusData) {
-  if (err) throw err;
-
-  console.log(censusData);
-
+// Retrieve data from the CSV file and execute everything below
+d3.csv("assets/data/data.csv").then(function(censusData) {
   // Step 1: Parse Data/Cast as numbers
   // ==============================
-  var states = cencusData.map(data => data.state);
   censusData.forEach(function(data) {
     data.poverty = +data.poverty;
     data.healthcare = +data.healthcare;
@@ -48,7 +44,6 @@ d3.csv("assets/data/data.csv", function(err, censusData) {
     .domain(d3.extent(censusData, d => d.healthcare))
     .range([height, 0]);
 
-  
   // Step 3: Create axis functions
   // ==============================
   var bottomAxis = d3.axisBottom(xLinearScale);
@@ -66,16 +61,20 @@ d3.csv("assets/data/data.csv", function(err, censusData) {
 
   // Step 5: Create Circles
   // ==============================
-  chartGroup.selectAll("circle")
+  var circles = chartGroup.selectAll("circle")
     .data(censusData)
     .enter()
     .append("circle")
     .attr("cx", d => xLinearScale(d.poverty))
     .attr("cy", d => yLinearScale(d.healthcare))
-    .attr("r", "20")
-    .attr("fill", d => d.abbr)
+    .attr("r", "15")
+    .attr("fill",  "blue")
     .attr("opacity", ".5");
-  
+
+  chartGroup.append("text")
+    .attr("dx", function(d){return -20})
+    .text(function(d){return d.abbr})
+
   // Step 6: Create axis labels
   // ==============================  
   chartGroup.append("text")
