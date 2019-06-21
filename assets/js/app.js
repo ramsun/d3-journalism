@@ -61,19 +61,33 @@ d3.csv("assets/data/data.csv").then(function(censusData) {
 
   // Step 5: Create Circles
   // ==============================
-  var circles = chartGroup.selectAll("circle")
+  chartGroup.selectAll("circle")
     .data(censusData)
     .enter()
     .append("circle")
     .attr("cx", d => xLinearScale(d.poverty))
     .attr("cy", d => yLinearScale(d.healthcare))
     .attr("r", "15")
-    .attr("fill",  "blue")
+    .attr("fill",  "grey")
     .attr("opacity", ".5");
 
+  // append the abbreviation to the circle
   chartGroup.append("text")
-    .attr("dx", function(d){return -20})
-    .text(function(d){return d.abbr})
+    .style("text-anchor", "middle")
+    .style("font-size", "12px")
+    .selectAll("tspan")
+    .data(censusData)
+    .enter()
+    .append("tspan")
+        .attr("x", function(data) {
+            return xLinearScale(data.poverty - 0);
+        })
+        .attr("y", function(data) {
+            return yLinearScale(data.healthcare - 0.2);
+        })
+        .text(function(data) {
+            return data.abbr
+        });
 
   // Step 6: Create axis labels
   // ==============================  
